@@ -11,6 +11,7 @@ import json
 import time
 import datetime
 import logging
+import time
 import imessage
 from lib.prettytable import PrettyTable
 
@@ -284,7 +285,7 @@ class Guahao(object):
 
         """获取就诊人Id"""
         if isinstance(doctor, str):
-            logging.error("没号了,  亲~")
+            logging.error("获取就诊人失败,  亲~")
             sys.exit(-1)
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
@@ -371,14 +372,16 @@ class Guahao(object):
         doctor = ""
         while True:
             doctor = self.select_doctor()       # 2. 选择医生
-            self.get_patient_id(doctor)         # 3. 获取病人id
             if doctor == "NoDuty":
                 logging.error("没号了,  亲~")
-                break
+                time.sleep(5)
+                continue
+                # break
             elif doctor == "NotReady":
                 logging.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
+                self.get_patient_id(doctor)         # 3. 获取病人id
                 sms_code = self.get_sms_verify_code()               # 获取验证码
                 if sms_code is None:
                     time.sleep(1)
